@@ -1,0 +1,84 @@
+CREATE TABLE users (
+    User_id INT AUTO_INCREMENT PRIMARY KEY,
+    User_name VARCHAR(100) NOT NULL,
+    User_email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_by TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE task (
+    Task_id INT AUTO_INCREMENT PRIMARY KEY,
+    Task_name VARCHAR(100) NOT NULL,
+    Task_slug VARCHAR(255)
+);
+
+CREATE TABLE jobs (
+    job_id INT AUTO_INCREMENT PRIMARY KEY,
+    job_name VARCHAR(100) NOT NULL,
+    cron_expression VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    modified_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    modified_by VARCHAR(100),
+    environment VARCHAR(50)
+);
+CREATE TABLE roles (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_type VARCHAR(100) NOT NULL,
+    role_name VARCHAR(100) NOT NULL,
+    created_by VARCHAR(100) NOT NULL,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE role_user_reference (
+    role_id INT ,
+    user_id INT NOT NULL,
+    assigned_by VARCHAR(100) NOT NULL,
+    assigned_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+CREATE TABLE environments (
+    environment_id INT AUTO_INCREMENT PRIMARY KEY,
+    environment_name VARCHAR(100) NOT NULL,
+    worker_ratio DECIMAL(5, 2) NOT NULL
+);
+CREATE TABLE job_reference (
+    step_id INT AUTO_INCREMENT PRIMARY KEY,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    modified_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    modified_by VARCHAR(100),
+    job_id INT NOT NULL,
+    sequence INT,
+    task_id INT,
+    task_param VARCHAR(255),
+    FOREIGN KEY (job_id) REFERENCES jobs(job_id)
+);
+CREATE TABLE job_run_status (
+    job_run_id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP,
+    run_by VARCHAR(100),
+    logfile_path VARCHAR(255),
+    FOREIGN KEY (job_id) REFERENCES jobs(job_id)
+);
+CREATE TABLE step_run_status (
+    step_run_id INT AUTO_INCREMENT PRIMARY KEY,
+    step_id INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP,
+    FOREIGN KEY (step_id) REFERENCES job_reference(step_id)
+);
+CREATE TABLE roles (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_type VARCHAR(100) NOT NULL,
+    role_name VARCHAR(100) NOT NULL,
+    created_by VARCHAR(100) NOT NULL,
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
